@@ -10,8 +10,9 @@ struct Node {
 class CircularList{
 private:
     Node* head;
+    int size;
 public:
-    CircularList(): head(nullptr) {}
+    CircularList(): head(nullptr), size(0) {}
     ~CircularList() {
         clear();
     }
@@ -29,6 +30,7 @@ public:
         } while(current != head);
 
         head = nullptr;
+        size = 0;
     }
 
     void append(int data){
@@ -44,6 +46,26 @@ public:
             head->prev->next = newNode;
             head->prev = newNode;
         }
+        size++;
+    }
+
+    void insertBefore(int target, int data){
+        if(!head) return;
+
+        Node* current = head;
+        do {
+            if(current->data == target){
+                Node* newNode = new Node(data);
+                newNode->next = current;
+                newNode->prev = current->prev;
+                current->prev->next = newNode;
+                current->prev = newNode;
+                if(current == head) head == newNode;
+                size++;
+                return;
+            }
+            current = current->next;
+        } while(current != head);
     }
 
     void remove(int data){
@@ -66,17 +88,19 @@ public:
                 }
 
                 delete current;
+                size--;
                 return;
             }
             current = current->next;
         } while(current != head);
     }
 
-    void print() {
-        if(head == nullptr){
-            std::cout << "empty list" << std::endl;
-            return;
-        }
+    int count() const {
+        return size;
+    }
+
+    void printForward() {
+        if(!head) return;
 
         Node* current = head;
         do {
@@ -86,17 +110,15 @@ public:
         std::cout << std::endl;
     }
 
-    bool isCircular() {
-        if(head == nullptr) return true;
+    void printBackward() {
+        if(!head) return;
 
-        Node* current = head;
-        while(current->next != head){
-            if(current->next == nullptr){
-                return false;
-            }
-            current = current->next;
-        }
-        return false;
+        Node* current = head->prev;
+        do {
+            std::cout << current->data << " ";
+            current = current->prev;
+        } while(current != head->prev);
+        std::cout << std::endl;
     }
 };
 
@@ -106,16 +128,14 @@ int main(){
     list.append(2);
     list.append(8);
     list.append(16);
-
-    list.print();
-
+    list.insertBefore(16, 12);
     list.remove(8);
-    list.print();
 
-    std::cout << "list is circular: " << (list.isCircular() ? "yes" : "no") << std::endl;
+    std::cout << "forward: " << std::endl;
+    list.printForward();
 
-    list.remove(2);
-    list.remove(16);
+    std::cout << "backward: " << std::endl;
+    list.printBackward();
 
-    list.print();
+    std::cout << "count: " << list.count() << std::endl;
 }

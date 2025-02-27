@@ -5,25 +5,8 @@ using namespace std;
 struct Node {
     int data;
     Node* next;
-    Node* prev;
+    Node(int data) : data(data), next(nullptr) {}
 };
-
-void append(Node** head, int data){
-    Node* new_node = new Node();
-    Node* last = *head;
-    new_node->data = data;
-    new_node->next = NULL;
-    if(*head == NULL){
-        new_node->prev = NULL;
-        *head = new_node;
-        return;
-    }
-    while(last->next != NULL){
-        last = last->next;
-    }
-    last->next = new_node;
-    new_node->prev = last;
-}
 
 void display(Node* node){
     while(node != NULL){
@@ -49,21 +32,26 @@ bool hasCycle(Node* head){
 }
 
 int main(){
-    Node* head = NULL;
+    Node* head1_1 = new Node(1);
+    Node* head2_1 = new Node(2);
+    Node* head3_1 = new Node(3);
+    Node* head4_1 = new Node(4);
 
-    append(&head, 1);
-    append(&head, 2);
-    append(&head, 3);
-    append(&head, 4);
+    head1_1->next = head2_1;
+    head2_1->next = head3_1;
+    head3_1->next = head4_1;
 
     // проверяем, работает ли функция, должно вывести "no"
-    cout << (hasCycle(head) ? "yes" : "no") << endl;
+    cout << (hasCycle(head1_1) ? "yes" : "no") << endl;
 
-    Node* last = head;
-    while (last->next != NULL) {
-        last = last->next;
-    }
-    last->next = head->next;
+    Node* head1_2 = new Node(1);
+    Node* head2_2 = new Node(2);
+    Node* head3_2 = new Node(3);
+    Node* head4_2 = new Node(4);
+
+    head1_2->next = head2_2;
+    head2_2->next = head3_2;
+    head3_2->next = head2_2; // ссылаемся на узел из середины
     
-    cout << (hasCycle(head) ? "yes" : "no") << endl;
+    cout << (hasCycle(head1_2) ? "yes" : "no") << endl;
 }
