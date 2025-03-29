@@ -1,67 +1,212 @@
 #include <iostream>
+#include <stack>
+using namespace std;
 
 enum Color
 {
-    BLACK,
-    RED
+    RED,
+    BLACK
 };
 
-template <typename T>
-class RBTree
+struct Node
 {
+    int value;
+    Color color;
+    Node *left;
+    Node *right;
+    Node *parent;
 
-    struct Node
+    explicit Node(const int val) : value(val), color(RED), left(nullptr), right(nullptr), parent(nullptr) {}
+};
+
+void rotateLeft(Node *&root, Node *node)
+{
+    Node *rightChild = node->right;
+    node->right = rightChild->left;
+
+    if (node->right != nullptr)
     {
-        T data;
-        Color color;
-        Node *parent, *left, *right;
-
-        Node(T data, Color color) : data(data), color(color), parent(nullptr), left(nullptr), right(nullptr) {}
-    };
-
-    Node *root;
-
-    void rotateLeft(Node *&node)
-    {
+        node->right->parent = node;
     }
 
-public:
-    void insert(T data)
-    {
-        Node *node = new Node(data);
-        Node *parent = nullptr;
-        Node *current = root;
+    rightChild->parent = node->parent;
 
-        while (current)
+    if (node->parent == nullptr)
+    {
+        root = rightChild;
+    }
+    else if (node == node->parent->left)
+    {
+        node->parent->left = rightChild;
+    }
+    else
+    {
+        node->parent->right = rightChild;
+    }
+
+    rightChild->left = node;
+    node->parent = rightChild;
+}
+
+void rotateRight(Node *&root, Node *node)
+{
+    Node *leftChild = node->left;
+    node->left = leftChild->right;
+
+    if (node->left != nullptr)
+    {
+        node->left->parent = node;
+    }
+
+    leftChild->parent = node->parent;
+
+    if (node->parent == nullptr)
+    {
+        root = leftChild;
+    }
+    else if (node == node->parent->left)
+    {
+        node->parent->left = leftChild;
+    }
+    else
+    {
+        node->parent->right = leftChild;
+    }
+
+    leftChild->right = node;
+    node->parent = leftChild;
+}
+
+void fixViolation(Node *&root, Node *&pt)
+{
+    Node *parent_pt = nullptr;
+    Node *grand_parent_pt = nullptr;
+
+    while ((pt != root) && (pt->color != BLACK) && (pt->parent->color == RED))
+    {
+        parent_pt = pt->parent;
+        grand_parent_pt = pt->parent->parent;
+
+        if (parent_pt == grand_parent_pt->left)
         {
-            parent = current;
-            if (node->data < current->data)
+            Node *uncle_pt = grand_parent_pt->right;
+
+            if (uncle_pt != nullptr && uncle_pt->color == RED)
             {
-                current = current->left;
+                grand_parent_pt->color = RED;
+                parent_pt->color = BLACK;
+                uncle_pt->color = BLACK;
+                pt = grand_parent_pt;
             }
             else
             {
-                current = current->right;
+                if (pt == parent_pt->right)
+                {
+                    rotateLeft(root, parent_pt);
+                    pt = parent_pt;
+                    parent_pt = pt->parent;
+                }
+
+                rotateRight(root, grand_parent_pt);
+                swap(parent_pt->color, grand_parent_pt->color);
+                pt = parent_pt;
             }
-        }
-
-        node->right = parent;
-
-        if (!parent)
-        {
-            root = node;
-        }
-        else if (node->data > parent->data)
-        {
-            parent->right = node;
         }
         else
         {
-            parent->left = node;
+            Node *uncle_pt = grand_parent_pt->left;
+
+            if (uncle_pt != nullptr && uncle_pt->color == RED)
+            {
+                grand_parent_pt->color = RED;
+                parent_pt->color = BLACK;
+                uncle_pt->color = BLACK;
+                pt = grand_parent_pt;
+            }
+            else
+            {
+                if (pt == parent_pt->left)
+                {
+                    rotateRight(root, parent_pt);
+                    pt = parent_pt;
+                    parent_pt = pt->parent;
+                }
+
+                rotateLeft(root, grand_parent_pt);
+                swap(parent_pt->color, grand_parent_pt->color);
+                pt = parent_pt;
+            }
         }
     }
-};
 
-int main()
+    root->color = BLACK;
+}
+
+void printNode(const Node *root)
 {
+    if (root == nullptr)
+    {
+        return;
+    }
+
+    std::stack<const Node *> stack;
+    const Node *current = root;
+
+    while (current != nullptr || !stack.empty())
+    {
+        while (current != nullptr)
+        {
+            stack.push(current);
+            current = current->left;
+        }
+
+        current = stack.top();
+        stack.pop();
+        cout << current->value << " " << (current->color == RED ? "RED" : "BLACK") << endl;
+        current = current->right;
+    }
+}
+void insert(Node*& root, const int value) {
+    auto newNode = new Node(value);
+    Node* parent = nullptr;
+    Node* current = root;
+
+    while (current != nullptr) {
+        parent = current;
+        if (newNode->value < current->value) {
+            current = current->left;
+        }
+        else {
+            current = current->right;
+        }
+    }
+
+    newNode->parent = parent;
+    if (parent == nullptr) {
+        root = newNode;
+    }
+    else if (newNode->value < parent->value) {
+        parent->left = newNode;
+    }
+    else {
+        parent->right = newNode;
+    }
+    fixViolation(root, newNode);
+}
+
+int main() {
+    Node* root = nullptr;
+
+    insert(root, 7);
+    insert(root, 2);
+    insert(root, 17);
+    insert(root, 9);
+    insert(root, 21);
+    insert(root, 6);
+    insert(root, 15);
+
+    printNode(root);
+    cout << endl;
+
+    return 0;
 }
