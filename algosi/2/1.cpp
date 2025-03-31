@@ -1,6 +1,4 @@
 #include <iostream>
-#include <algorithm>
-#include <string>
 
 struct Node {
     int data;
@@ -37,14 +35,14 @@ Node* insert(Node* root, int value) {
     return root;
 }
 
-void printTree(Node* root, const std::string& prefix = "", bool isLeft = false) {
+void print(Node* root, const std::string& prefix = "", bool isLeft = false) {
     if (!root) return;
     
     std::cout << prefix << " ";
     std::cout << root->data << " [balance: " << balanceFactor(root) << "]" << std::endl;
     
-    printTree(root->left, prefix + (isLeft ? "   " : "    "), true);
-    printTree(root->right, prefix + (isLeft ? "   " : "    "), false);
+    print(root->left, prefix + (isLeft ? "   " : "    "), true);
+    print(root->right, prefix + (isLeft ? "   " : "    "), false);
 }
 
 void del(Node* root) {
@@ -65,7 +63,7 @@ int main() {
     root = insert(root, 7);
     root = insert(root, 10);
     
-    printTree(root);
+    print(root);
     
     del(root);
     return 0;
