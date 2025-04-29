@@ -73,5 +73,5 @@ int main(){
 
     deleteWord(root, "hello", 0);
 
-    cout << search("hello");
+    cout << search("hello") << endl;
 }

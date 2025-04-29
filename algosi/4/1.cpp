@@ -64,5 +64,5 @@ int main(){
     insert("heaven");
     insert("heavy");
 
-    cout << countWords("hea");
+    cout << countWords("hea") << endl;
 }
