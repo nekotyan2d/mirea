@@ -5,7 +5,6 @@
 
 using namespace std;
 
-// Проверяет, является ли prefix префиксом строки word
 bool isPrefix(const string &prefix, const string &word)
 {
     if (prefix.size() > word.size())
@@ -45,7 +44,7 @@ int main()
         }
     }
 
-    cout << result << " (Prefixes:";
+    cout << result << " (prefixes:";
     for (const auto &prefix : words)
     {
         if (isPrefix(prefix, result))
